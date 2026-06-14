@@ -11,6 +11,7 @@ function StatusPill({ tone = 'warning', label }) {
   const tones = {
     warning: { bg: '#FFFBEB', color: '#92400E', border: '#FCD34D60' },
     info:    { bg: '#EFF6FF', color: '#1D4ED8', border: '#BFDBFE80' },
+    success: { bg: '#F0FDF4', color: '#166534', border: '#86EFAC80' },
   };
   const t = tones[tone] || tones.warning;
   return (
@@ -125,6 +126,7 @@ function LayerCard({ num, title, capaKey, capa, defaultOpen = false, children })
   const [open, setOpen] = useState(defaultOpen);
   const pendiente = capa && capa.disponible === false;
   const parcial = capa && capa.disponible === true && capa.parcial === true;
+  const completa = capa && capa.disponible === true && !capa.parcial;
 
   // Progreso de fuentes para el pill "PARCIAL"
   const fuentesPresentes = capa?.fuentes_presentes?.length || 0;
@@ -160,6 +162,7 @@ function LayerCard({ num, title, capaKey, capa, defaultOpen = false, children })
           </span>
           {pendiente && <StatusPill tone="warning" label="PENDIENTE" />}
           {parcial && <StatusPill tone="info" label={parcialLabel} />}
+          {completa && <StatusPill tone="success" label="COMPLETA" />}
         </div>
         <svg
           width="16" height="16" viewBox="0 0 24 24"
