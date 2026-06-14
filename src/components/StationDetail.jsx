@@ -111,10 +111,27 @@ function PoiRow({ label, kpi, dist }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Card colapsable de una capa
 // ─────────────────────────────────────────────────────────────────────────────
-function LayerCard({ num, title, capa, defaultOpen = false, children }) {
+// Total de fuentes previstas por capa (numerador = fuentes ya integradas)
+const FUENTES_PREVISTAS = {
+  c1_interno: 1,     // Sistemas Petronor
+  c2_demanda: 4,     // INE + Eustat + DGT + Catastro
+  c3_competencia: 3, // MITECO + OSM + OpenChargeMap
+  c4_activo: 1,      // Catastro
+  c5_movilidad: 1,   // Aforos DGT
+  c6_reputacion: 1,  // Google Maps manual
+};
+
+function LayerCard({ num, title, capaKey, capa, defaultOpen = false, children }) {
   const [open, setOpen] = useState(defaultOpen);
   const pendiente = capa && capa.disponible === false;
   const parcial = capa && capa.disponible === true && capa.parcial === true;
+
+  // Progreso de fuentes para el pill "PARCIAL"
+  const fuentesPresentes = capa?.fuentes_presentes?.length || 0;
+  const fuentesPrevistas = FUENTES_PREVISTAS[capaKey] || null;
+  const parcialLabel = fuentesPrevistas
+    ? `PARCIAL · ${fuentesPresentes} de ${fuentesPrevistas}`
+    : 'PARCIAL';
 
   return (
     <div
@@ -142,7 +159,7 @@ function LayerCard({ num, title, capa, defaultOpen = false, children }) {
             {title}
           </span>
           {pendiente && <StatusPill tone="warning" label="PENDIENTE" />}
-          {parcial && <StatusPill tone="info" label="PARCIAL" />}
+          {parcial && <StatusPill tone="info" label={parcialLabel} />}
         </div>
         <svg
           width="16" height="16" viewBox="0 0 24 24"
@@ -409,11 +426,11 @@ export default function StationDetail({ station }) {
 
         <div className="flex flex-col gap-3">
 
-          <LayerCard num={1} title="Datos internos del negocio" capa={c1}>
+          <LayerCard num={1} title="Datos internos del negocio" capaKey="c1_interno" capa={c1}>
             <PendientePanel capa={c1} />
           </LayerCard>
 
-          <LayerCard num={2} title="Demanda territorial" capa={c2}>
+          <LayerCard num={2} title="Demanda territorial" capaKey="c2_demanda" capa={c2}>
             <PendientePanel capa={c2} />
           </LayerCard>
 
@@ -421,6 +438,7 @@ export default function StationDetail({ station }) {
           <LayerCard
             num={3}
             title="Mapa competitivo"
+            capaKey="c3_competencia"
             capa={c3}
             defaultOpen={c3?.disponible === true}
           >
@@ -458,7 +476,7 @@ export default function StationDetail({ station }) {
                       marginTop: '10px',
                       fontStyle: 'italic',
                     }}>
-                      EV (OpenChargeMap) y POIs (OSM) pendientes de integración.
+                      Precios MITECO + entorno OSM integrados. Cargadores EV (OpenChargeMap) pendientes.
                     </div>
                   )}
                 </div>
@@ -566,7 +584,7 @@ export default function StationDetail({ station }) {
             <PendientePanel capa={c4} />
           </LayerCard>
 
-          <LayerCard num={5} title="Movilidad real" capa={c5}>
+          <LayerCard num={6} title="Reputación de servicio" capaKey="c6_reputacion" capa={c6} defaultOpen={true}>
             <PendientePanel capa={c5} />
           </LayerCard>
 
