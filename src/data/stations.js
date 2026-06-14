@@ -3,6 +3,7 @@
 // 4 Petronor + 6 competidores (Repsol excluido por pertenecer al mismo grupo)
 
 import C3_MITECO from './c3_miteco.json';
+import C3_OSM    from './c3_osm.json';
 
 // ============================================================================
 // REGISTRO DE FUENTES
@@ -53,25 +54,29 @@ const capaPendiente = (fuentes_previstas) => ({
 // ============================================================================
 function buildC3(stationId, tipo) {
   const data = C3_MITECO?.estaciones?.[stationId];
-  if (!data) {
+  const osm  = C3_OSM?.estaciones?.[stationId];
+
+  if (!data && !osm) {
     return capaPendiente(['MITECO', 'OpenChargeMap', 'OpenStreetMap']);
   }
 
-  const fecha = data.fecha_dato || C3_MITECO.fecha_actualizacion;
+  const fecha = data?.fecha_dato || C3_MITECO?.fecha_actualizacion;
+  const tieneTodas = data && osm; // OpenChargeMap aún pendiente, siempre parcial
   const c3 = {
     disponible: true,
-    parcial: true, // EV (OpenChargeMap) y POIs (OSM) aún pendientes en Fase 4
-    miteco_id: data.miteco_id,
-    rotulo_miteco: data.rotulo,
-    horario: data.horario,
-    g95:            data.g95            != null ? dato(data.g95,            FUENTES.MITECO, fecha) : noDisp(),
-    g98:            data.g98            != null ? dato(data.g98,            FUENTES.MITECO, fecha) : noDisp(),
-    diesel_a:       data.diesel_a       != null ? dato(data.diesel_a,       FUENTES.MITECO, fecha) : noDisp(),
-    diesel_premium: data.diesel_premium != null ? dato(data.diesel_premium, FUENTES.MITECO, fecha) : noDisp(),
+    parcial: true, // EV (OpenChargeMap) aún pendiente
+    fuentes_presentes: [data && 'miteco', osm && 'osm'].filter(Boolean),
+    miteco_id: data?.miteco_id,
+    rotulo_miteco: data?.rotulo,
+    horario: data?.horario,
+    g95:            data?.g95            != null ? dato(data.g95,            FUENTES.MITECO, fecha) : noDisp(),
+    g98:            data?.g98            != null ? dato(data.g98,            FUENTES.MITECO, fecha) : noDisp(),
+    diesel_a:       data?.diesel_a       != null ? dato(data.diesel_a,       FUENTES.MITECO, fecha) : noDisp(),
+    diesel_premium: data?.diesel_premium != null ? dato(data.diesel_premium, FUENTES.MITECO, fecha) : noDisp(),
   };
 
   // Para Petronor: añadir métricas de cluster (vs. sus 2 competidores)
-  const cluster = C3_MITECO?.clusters?.[stationId];
+  const cluster = data ? C3_MITECO?.clusters?.[stationId] : null;
   if (cluster && tipo === 'petronor') {
     c3.n_competidores_con_dato  = cluster.n_competidores_con_dato;
     c3.media_competencia_g95    = cluster.media_competencia_g95    != null ? dato(cluster.media_competencia_g95,    FUENTES.MITECO, fecha) : noDisp();
@@ -80,6 +85,36 @@ function buildC3(stationId, tipo) {
     c3.media_competencia_diesel = cluster.media_competencia_diesel != null ? dato(cluster.media_competencia_diesel, FUENTES.MITECO, fecha) : noDisp();
     c3.min_competencia_diesel   = cluster.min_competencia_diesel   != null ? dato(cluster.min_competencia_diesel,   FUENTES.MITECO, fecha) : noDisp();
     c3.gap_vs_min_diesel        = cluster.gap_vs_min_diesel        != null ? dato(cluster.gap_vs_min_diesel,        FUENTES.MITECO, fecha) : noDisp();
+  }
+
+  // ── OpenStreetMap (POIs del entorno comercial en 1 km) ────────────────────
+  if (osm) {
+    const fechaO = C3_OSM.fecha_actualizacion;
+    const poi = (key) => {
+      const b = osm[key];
+      if (!b || b.count == null) return noDisp();
+      return dato(b.count, FUENTES.OSM, fechaO);
+    };
+    const dist = (key) => {
+      const b = osm[key];
+      if (!b || b.nearest_m == null) return noDisp();
+      return dato(b.nearest_m, FUENTES.OSM, fechaO);
+    };
+
+    c3.radio_poi_m             = C3_OSM.radio_metros;
+    c3.n_supermercados_1km     = poi('supermercados');
+    c3.n_cafes_1km             = poi('cafes');
+    c3.n_restaurantes_1km      = poi('restaurantes');
+    c3.n_hoteles_1km           = poi('hoteles');
+    c3.n_lavados_1km           = poi('lavados');
+    c3.n_cargadores_ev_osm     = poi('cargadores_ev');
+    c3.n_eess_competencia_osm  = poi('eess_competencia');
+
+    c3.dist_supermercado_m     = dist('supermercados');
+    c3.dist_cafe_m             = dist('cafes');
+    c3.dist_restaurante_m      = dist('restaurantes');
+    c3.dist_hotel_m            = dist('hoteles');
+    c3.dist_eess_competencia_m = dist('eess_competencia');
   }
 
   return c3;

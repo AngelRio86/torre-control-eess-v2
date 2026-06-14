@@ -1,0 +1,316 @@
+{
+  "fecha_actualizacion": "2026-06-14T14:11:15.955002+00:00",
+  "fuente": "openstreetmap_overpass",
+  "radio_metros": 1000,
+  "categorias": [
+    "supermercados",
+    "cafes",
+    "restaurantes",
+    "hoteles",
+    "lavados",
+    "cargadores_ev",
+    "eess_competencia"
+  ],
+  "estaciones": {
+    "PET-BIL-001": {
+      "supermercados": {
+        "count": 3,
+        "nearest_m": 815
+      },
+      "cafes": {
+        "count": 0,
+        "nearest_m": null
+      },
+      "restaurantes": {
+        "count": 6,
+        "nearest_m": 250
+      },
+      "hoteles": {
+        "count": 1,
+        "nearest_m": 677
+      },
+      "lavados": {
+        "count": 0,
+        "nearest_m": null
+      },
+      "cargadores_ev": {
+        "count": 0,
+        "nearest_m": null
+      },
+      "eess_competencia": {
+        "count": 0,
+        "nearest_m": null
+      }
+    },
+    "PET-SES-001": {
+      "supermercados": {
+        "count": 22,
+        "nearest_m": 270
+      },
+      "cafes": {
+        "count": 28,
+        "nearest_m": 307
+      },
+      "restaurantes": {
+        "count": 34,
+        "nearest_m": 375
+      },
+      "hoteles": {
+        "count": 3,
+        "nearest_m": 244
+      },
+      "lavados": {
+        "count": 0,
+        "nearest_m": null
+      },
+      "cargadores_ev": {
+        "count": 0,
+        "nearest_m": null
+      },
+      "eess_competencia": {
+        "count": 1,
+        "nearest_m": 39
+      }
+    },
+    "PET-ERA-057": {
+      "supermercados": {
+        "count": 1,
+        "nearest_m": 852
+      },
+      "cafes": {
+        "count": 0,
+        "nearest_m": null
+      },
+      "restaurantes": {
+        "count": 2,
+        "nearest_m": 641
+      },
+      "hoteles": {
+        "count": 1,
+        "nearest_m": 776
+      },
+      "lavados": {
+        "count": 0,
+        "nearest_m": null
+      },
+      "cargadores_ev": {
+        "count": 1,
+        "nearest_m": 17
+      },
+      "eess_competencia": {
+        "count": 1,
+        "nearest_m": 784
+      }
+    },
+    "PET-ERA-055": {
+      "supermercados": {
+        "count": 2,
+        "nearest_m": 898
+      },
+      "cafes": {
+        "count": 4,
+        "nearest_m": 833
+      },
+      "restaurantes": {
+        "count": 2,
+        "nearest_m": 977
+      },
+      "hoteles": {
+        "count": 0,
+        "nearest_m": null
+      },
+      "lavados": {
+        "count": 0,
+        "nearest_m": null
+      },
+      "cargadores_ev": {
+        "count": 0,
+        "nearest_m": null
+      },
+      "eess_competencia": {
+        "count": 0,
+        "nearest_m": null
+      }
+    },
+    "MOE-BIL-001": {
+      "supermercados": {
+        "count": 78,
+        "nearest_m": 77
+      },
+      "cafes": {
+        "count": 153,
+        "nearest_m": 116
+      },
+      "restaurantes": {
+        "count": 366,
+        "nearest_m": 53
+      },
+      "hoteles": {
+        "count": 60,
+        "nearest_m": 119
+      },
+      "lavados": {
+        "count": 0,
+        "nearest_m": null
+      },
+      "cargadores_ev": {
+        "count": 4,
+        "nearest_m": 421
+      },
+      "eess_competencia": {
+        "count": 0,
+        "nearest_m": null
+      }
+    },
+    "NAF-BAR-001": {
+      "supermercados": {
+        "count": 9,
+        "nearest_m": 344
+      },
+      "cafes": {
+        "count": 24,
+        "nearest_m": 295
+      },
+      "restaurantes": {
+        "count": 28,
+        "nearest_m": 89
+      },
+      "hoteles": {
+        "count": 1,
+        "nearest_m": 670
+      },
+      "lavados": {
+        "count": 2,
+        "nearest_m": 743
+      },
+      "cargadores_ev": {
+        "count": 6,
+        "nearest_m": 434
+      },
+      "eess_competencia": {
+        "count": 3,
+        "nearest_m": 147
+      }
+    },
+    "MOE-POR-001": {
+      "supermercados": {
+        "count": 29,
+        "nearest_m": 267
+      },
+      "cafes": {
+        "count": 26,
+        "nearest_m": 99
+      },
+      "restaurantes": {
+        "count": 31,
+        "nearest_m": 112
+      },
+      "hoteles": {
+        "count": 9,
+        "nearest_m": 153
+      },
+      "lavados": {
+        "count": 1,
+        "nearest_m": 468
+      },
+      "cargadores_ev": {
+        "count": 1,
+        "nearest_m": 443
+      },
+      "eess_competencia": {
+        "count": 1,
+        "nearest_m": 933
+      }
+    },
+    "ERO-POR-001": {
+      "supermercados": {
+        "count": 16,
+        "nearest_m": 110
+      },
+      "cafes": {
+        "count": 13,
+        "nearest_m": 134
+      },
+      "restaurantes": {
+        "count": 21,
+        "nearest_m": 189
+      },
+      "hoteles": {
+        "count": 3,
+        "nearest_m": 635
+      },
+      "lavados": {
+        "count": 1,
+        "nearest_m": 18
+      },
+      "cargadores_ev": {
+        "count": 1,
+        "nearest_m": 61
+      },
+      "eess_competencia": {
+        "count": 0,
+        "nearest_m": null
+      }
+    },
+    "SHE-ERA-001": {
+      "supermercados": {
+        "count": 0,
+        "nearest_m": null
+      },
+      "cafes": {
+        "count": 0,
+        "nearest_m": null
+      },
+      "restaurantes": {
+        "count": 2,
+        "nearest_m": 421
+      },
+      "hoteles": {
+        "count": 1,
+        "nearest_m": 941
+      },
+      "lavados": {
+        "count": 0,
+        "nearest_m": null
+      },
+      "cargadores_ev": {
+        "count": 2,
+        "nearest_m": 415
+      },
+      "eess_competencia": {
+        "count": 1,
+        "nearest_m": 19
+      }
+    },
+    "ERO-LEI-001": {
+      "supermercados": {
+        "count": 7,
+        "nearest_m": 703
+      },
+      "cafes": {
+        "count": 5,
+        "nearest_m": 25
+      },
+      "restaurantes": {
+        "count": 5,
+        "nearest_m": 51
+      },
+      "hoteles": {
+        "count": 0,
+        "nearest_m": null
+      },
+      "lavados": {
+        "count": 0,
+        "nearest_m": null
+      },
+      "cargadores_ev": {
+        "count": 2,
+        "nearest_m": 47
+      },
+      "eess_competencia": {
+        "count": 0,
+        "nearest_m": null
+      }
+    }
+  }
+}
