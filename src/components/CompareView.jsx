@@ -94,6 +94,7 @@ function CompareLayerCard({ capaKey, title, stations, defaultOpen = false }) {
                 const kpis = stations.map(st => getKpi(st.capas[capaKey], key));
                 const values = kpis.map(k => k?.valor ?? null);
                 const bestIdx = findBestIdx(values, better);
+                const worstIdx = findBestIdx(values, better === 'higher' ? 'lower' : 'higher');
 
                 return (
                   <div
@@ -111,7 +112,24 @@ function CompareLayerCard({ capaKey, title, stations, defaultOpen = false }) {
                     {kpis.map((kpi, i) => {
                       const isBest = i === bestIdx;
                       return (
-                        <div key={i} className="flex flex-col items-end gap-0.5">
+                        <div
+                          key={i}
+                          className="flex flex-col items-end gap-0.5"
+                          style={{
+                            padding: '6px 10px',
+                            borderRadius: '6px',
+                            background: i === bestIdx
+                              ? '#F0FDF4'  // verde muy suave
+                              : i === worstIdx
+                                ? '#FEF2F2'  // rojo muy suave
+                                : 'transparent',
+                            border: i === bestIdx
+                              ? '1px solid #86EFAC60'
+                              : i === worstIdx
+                                ? '1px solid #FCA5A560'
+                                : '1px solid transparent',
+                          }}
+                        >
                           {kpi?.valor != null ? (
                             <>
                               <div className="flex items-center gap-1.5">
@@ -158,6 +176,128 @@ function CompareLayerCard({ capaKey, title, stations, defaultOpen = false }) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Componente principal
+// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// Veredicto global: cuenta KPIs ganados por cada estación
+// ─────────────────────────────────────────────────────────────────────────────
+function Veredicto({ stations }) {
+  // Recorre todas las capas y todos los KPIs, cuenta cuántos gana cada estación
+  const wins = stations.map(() => 0);
+  let totalComparable = 0;
+
+  CAPA_KEYS.forEach(capaKey => {
+    const config = COMPARE_CONFIG[capaKey] || [];
+    config.forEach(({ key, better }) => {
+      const values = stations.map(st => getKpi(st.capas[capaKey], key)?.valor ?? null);
+      const validCount = values.filter(v => v !== null).length;
+      if (validCount < 2) return; // necesitamos al menos 2 para comparar
+      const bestIdx = findBestIdx(values, better);
+      if (bestIdx >= 0) {
+        wins[bestIdx]++;
+        totalComparable++;
+      }
+    });
+  });
+
+  if (totalComparable === 0) {
+    return (
+      <div
+        className="rounded-xl p-5 mt-4"
+        style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+      >
+        <div style={{ fontSize: '12px', color: 'var(--text-sub)', textAlign: 'center' }}>
+          Aún no hay KPIs comparables entre las estaciones seleccionadas.
+        </div>
+      </div>
+    );
+  }
+
+  // Ordenar las estaciones por victorias para destacar al líder
+  const ranking = stations
+    .map((st, i) => ({ st, wins: wins[i], idx: i }))
+    .sort((a, b) => b.wins - a.wins);
+  const lider = ranking[0];
+
+  return (
+    <div
+      className="rounded-xl p-6 mt-4"
+      style={{
+        background: 'linear-gradient(135deg, var(--surface) 0%, #FAFBFC 100%)',
+        border: '1px solid var(--border)',
+      }}
+    >
+      <div style={{
+        fontSize: '10px',
+        color: 'var(--text-dim)',
+        fontFamily: 'JetBrains Mono, monospace',
+        textTransform: 'uppercase',
+        letterSpacing: '0.12em',
+        marginBottom: '14px',
+      }}>
+        Veredicto global · {totalComparable} KPIs comparados
+      </div>
+
+      <div className="flex flex-col gap-3">
+        {ranking.map(({ st, wins: w, idx }, rank) => {
+          const pct = totalComparable > 0 ? (w / totalComparable) * 100 : 0;
+          const isLeader = rank === 0 && w > lider.wins / 2; // líder claro solo si tiene ventaja
+          return (
+            <div key={st.id} className="flex items-center gap-3">
+              <div style={{
+                width: '28px',
+                fontFamily: 'JetBrains Mono, monospace',
+                fontSize: '11px',
+                color: 'var(--text-dim)',
+                textAlign: 'center',
+              }}>
+                {rank === 0 ? '🥇' : rank === 1 ? '🥈' : rank === 2 ? '🥉' : `#${rank + 1}`}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: 'var(--text-head)',
+                  marginBottom: '4px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}>
+                  {st.nombre}
+                </div>
+                <div style={{
+                  height: '6px',
+                  background: '#E5E7EB',
+                  borderRadius: '3px',
+                  overflow: 'hidden',
+                }}>
+                  <div style={{
+                    width: `${pct}%`,
+                    height: '100%',
+                    background: isLeader ? '#10B981' : '#94A3B8',
+                    transition: 'width 0.3s ease',
+                  }} />
+                </div>
+              </div>
+              <div style={{
+                fontFamily: 'JetBrains Mono, monospace',
+                fontSize: '13px',
+                fontWeight: 600,
+                color: 'var(--text-head)',
+                minWidth: '70px',
+                textAlign: 'right',
+              }}>
+                {w} de {totalComparable}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Vista principal de comparación
 // ─────────────────────────────────────────────────────────────────────────────
 export default function CompareView({ stations }) {
   if (!stations || stations.length === 0) return null;
@@ -232,6 +372,9 @@ export default function CompareView({ stations }) {
             />
           ))}
         </div>
+
+        {/* ─── VEREDICTO GLOBAL ──────────────────────────────────────── */}
+        <Veredicto stations={stations} />
       </div>
     </div>
   );
