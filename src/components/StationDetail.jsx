@@ -584,7 +584,7 @@ export default function StationDetail({ station }) {
             <PendientePanel capa={c4} />
           </LayerCard>
 
-          <LayerCard num={6} title="Reputación de servicio" capaKey="c6_reputacion" capa={c6} defaultOpen={true}>
+          <LayerCard num={5} title="Movilidad real" capaKey="c5_movilidad" capa={c5}>
             <PendientePanel capa={c5} />
           </LayerCard>
 
