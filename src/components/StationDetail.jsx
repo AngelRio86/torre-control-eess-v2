@@ -50,7 +50,59 @@ function KpiRow({ label, kpi, format = v => v, accent }) {
         whiteSpace: 'nowrap',
         marginLeft: '12px',
       }}>
-        {isAvailable ? format(kpi.valor) : '—'}
+      {isAvailable ? format(kpi.valor) : '—'}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Fila compacta para mostrar un POI: icono+label, contador, distancia
+// ─────────────────────────────────────────────────────────────────────────────
+function PoiRow({ label, kpi, dist }) {
+  if (!kpi) return null;
+  const count = kpi.valor;
+  const isAvailable = count != null;
+  const distVal = dist?.valor;
+  const hasCount = isAvailable && count > 0;
+
+  return (
+    <div
+      className="flex items-center justify-between py-2 border-b last:border-b-0"
+      style={{ borderColor: 'var(--border-soft)' }}
+    >
+      <div style={{
+        fontSize: '12px',
+        color: 'var(--text-sub)',
+        flex: 1,
+      }}>
+        {label}
+      </div>
+      <div style={{
+        display: 'flex',
+        alignItems: 'baseline',
+        gap: '10px',
+        marginLeft: '12px',
+      }}>
+        <span style={{
+          fontFamily: 'JetBrains Mono, monospace',
+          fontSize: '13px',
+          fontWeight: 600,
+          color: hasCount ? 'var(--text-head)' : 'var(--text-dim)',
+        }}>
+          {isAvailable ? count : '—'}
+        </span>
+        {hasCount && distVal != null && (
+          <span style={{
+            fontFamily: 'JetBrains Mono, monospace',
+            fontSize: '11px',
+            color: 'var(--text-dim)',
+            minWidth: '52px',
+            textAlign: 'right',
+          }}>
+            {distVal < 1000 ? `${distVal} m` : `${(distVal / 1000).toFixed(1)} km`}
+          </span>
+        )}
       </div>
     </div>
   );
@@ -448,8 +500,46 @@ export default function StationDetail({ station }) {
                       format={fmtGap}
                       accent={c3.gap_vs_min_diesel?.valor > 0 ? 'var(--yellow)' : c3.gap_vs_min_diesel?.valor < 0 ? 'var(--green)' : undefined}
                     />
-                  </div>
-                ) : (
+                 </div>
+                ) : null}
+
+                {/* ── ENTORNO COMERCIAL (OSM POIs en 1 km) ───────────────── */}
+                {c3.n_supermercados_1km && (
+                  <>
+                    <div className="mt-3" style={{ height: '12px' }} />
+                    <div style={{
+                      fontSize: '11px',
+                      color: 'var(--text-dim)',
+                      fontFamily: 'JetBrains Mono, monospace',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.08em',
+                      marginBottom: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}>
+                      <span>Entorno comercial</span>
+                      <span style={{
+                        fontSize: '10px',
+                        color: 'var(--text-sub)',
+                        textTransform: 'none',
+                        letterSpacing: 0,
+                      }}>
+                        (radio {c3.radio_poi_m} m)
+                      </span>
+                    </div>
+                    <PoiRow label="🛒  Supermercados"    kpi={c3.n_supermercados_1km}    dist={c3.dist_supermercado_m} />
+                    <PoiRow label="☕  Cafés"            kpi={c3.n_cafes_1km}            dist={c3.dist_cafe_m} />
+                    <PoiRow label="🍽️  Restaurantes"     kpi={c3.n_restaurantes_1km}     dist={c3.dist_restaurante_m} />
+                    <PoiRow label="🏨  Hoteles"          kpi={c3.n_hoteles_1km}          dist={c3.dist_hotel_m} />
+                    <PoiRow label="🧼  Lavados"          kpi={c3.n_lavados_1km}          dist={null} />
+                    <PoiRow label="⚡  Cargadores EV"    kpi={c3.n_cargadores_ev_osm}    dist={null} />
+                    <PoiRow label="⛽  EESS competencia" kpi={c3.n_eess_competencia_osm} dist={c3.dist_eess_competencia_m} />
+                  </>
+                )}
+
+                {/* ── Mensaje pendientes ─────────────────────────────────── */}
+                {!hasClusterData && !c3.n_supermercados_1km && (
                   <div>
                     <div style={{
                       fontSize: '11px',
@@ -462,8 +552,7 @@ export default function StationDetail({ station }) {
                       Próximos datos
                     </div>
                     <p style={{ fontSize: '12px', color: 'var(--text-sub)', lineHeight: 1.6 }}>
-                      Cargadores EV (OpenChargeMap), POIs en 1 km (supermercados, cafés, restaurantes — OpenStreetMap)
-                      y la posición competitiva del cluster se añadirán en próximas iteraciones de la Fase 4.
+                      Cargadores EV detallados (OpenChargeMap) en próximas iteraciones de la Fase 4.
                     </p>
                   </div>
                 )}
