@@ -20,10 +20,19 @@ export const COMPARE_CONFIG = {
   c1_interno: [],
   c2_demanda: [],
   c3_competencia: [
-    { key: 'g95',            label: 'Gasolina 95 E5',  better: 'lower', format: v => `${v.toFixed(3)} €/L` },
-    { key: 'g98',            label: 'Gasolina 98 E5',  better: 'lower', format: v => `${v.toFixed(3)} €/L` },
-    { key: 'diesel_a',       label: 'Diésel A',        better: 'lower', format: v => `${v.toFixed(3)} €/L` },
-    { key: 'diesel_premium', label: 'Diésel Premium',  better: 'lower', format: v => `${v.toFixed(3)} €/L` },
+    // ── Precios (MITECO) ──────────────────────────────────────────────────
+    { key: 'g95',            label: 'Gasolina 95 E5',     better: 'lower',  format: v => `${v.toFixed(3)} €/L` },
+    { key: 'g98',            label: 'Gasolina 98 E5',     better: 'lower',  format: v => `${v.toFixed(3)} €/L` },
+    { key: 'diesel_a',       label: 'Diésel A',           better: 'lower',  format: v => `${v.toFixed(3)} €/L` },
+    { key: 'diesel_premium', label: 'Diésel Premium',     better: 'lower',  format: v => `${v.toFixed(3)} €/L` },
+    // ── Entorno comercial (OSM, radio 1 km) ───────────────────────────────
+    { key: 'n_supermercados_1km',    label: '🛒 Supermercados (1 km)',  better: 'higher', format: v => v.toLocaleString('es-ES') },
+    { key: 'n_cafes_1km',            label: '☕ Cafés (1 km)',          better: 'higher', format: v => v.toLocaleString('es-ES') },
+    { key: 'n_restaurantes_1km',     label: '🍽️ Restaurantes (1 km)',   better: 'higher', format: v => v.toLocaleString('es-ES') },
+    { key: 'n_hoteles_1km',          label: '🏨 Hoteles (1 km)',        better: 'higher', format: v => v.toLocaleString('es-ES') },
+    { key: 'n_lavados_1km',          label: '🧼 Lavados (1 km)',        better: 'higher', format: v => v.toLocaleString('es-ES') },
+    { key: 'n_cargadores_ev_osm',    label: '⚡ Cargadores EV (1 km)',  better: 'higher', format: v => v.toLocaleString('es-ES') },
+    { key: 'n_eess_competencia_osm', label: '⛽ EESS competencia (1 km)', better: 'lower',  format: v => v.toLocaleString('es-ES') },
   ],
   c4_activo: [],
   c5_movilidad: [],
