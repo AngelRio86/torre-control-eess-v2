@@ -1,0 +1,103 @@
+{
+  "fecha_actualizacion": "2026-06-15",
+  "fuente_principal": "DGT — Mapa de Aforos 2023 (último publicado)",
+  "notas": [
+    "IMD: Intensidad Media Diaria (vehículos/día) en el tramo de carretera más próximo a cada estación",
+    "Tipo vía: clasifica la carretera según la categoría DGT",
+    "Pct pesados: % de vehículos pesados sobre el total IMD (orientativo para potencial de servicios premium)",
+    "Sentidos: si la estación es accesible en ambos sentidos o solo uno",
+    "Algunas estaciones urbanas no tienen estación de aforo DGT exacta; se usa el aforo del eje principal más próximo"
+  ],
+  "estaciones": {
+    "PET-BIL-001": {
+      "via": "N-634",
+      "tramo": "N-634 entrada a Bilbao (Begoña)",
+      "tipo_via": "carretera_nacional",
+      "imd": 28450,
+      "pct_pesados": 7.2,
+      "sentidos": "ambos",
+      "fecha_dato": "2023-12-31"
+    },
+    "PET-SES-001": {
+      "via": "BI-3739",
+      "tramo": "Sestao casco urbano",
+      "tipo_via": "carretera_local",
+      "imd": 6800,
+      "pct_pesados": 3.1,
+      "sentidos": "ambos",
+      "fecha_dato": "2023-12-31"
+    },
+    "PET-ERA-057": {
+      "via": "BI-3704",
+      "tramo": "BI-3704 Asua-Loiu km 5",
+      "tipo_via": "carretera_local",
+      "imd": 18200,
+      "pct_pesados": 6.5,
+      "sentidos": "ambos",
+      "fecha_dato": "2023-12-31"
+    },
+    "PET-ERA-055": {
+      "via": "BI-3704",
+      "tramo": "BI-3704 km 5,5",
+      "tipo_via": "carretera_local",
+      "imd": 19100,
+      "pct_pesados": 6.5,
+      "sentidos": "ambos",
+      "fecha_dato": "2023-12-31"
+    },
+    "MOE-BIL-001": {
+      "via": "Calle Juan de Garay",
+      "tramo": "Bilbao urbano (Casco Viejo - Ensanche)",
+      "tipo_via": "via_urbana",
+      "imd": 8400,
+      "pct_pesados": 1.8,
+      "sentidos": "ambos",
+      "fecha_dato": "2023-12-31"
+    },
+    "NAF-BAR-001": {
+      "via": "Calle Retuerto",
+      "tramo": "Barakaldo casco urbano",
+      "tipo_via": "via_urbana",
+      "imd": 11200,
+      "pct_pesados": 2.3,
+      "sentidos": "ambos",
+      "fecha_dato": "2023-12-31"
+    },
+    "MOE-POR-001": {
+      "via": "Avenida Ramón y Cajal",
+      "tramo": "Portugalete casco urbano",
+      "tipo_via": "via_urbana",
+      "imd": 9700,
+      "pct_pesados": 2.1,
+      "sentidos": "ambos",
+      "fecha_dato": "2023-12-31"
+    },
+    "ERO-POR-001": {
+      "via": "Avenida Vega de Ibarra",
+      "tramo": "Portugalete - acceso A-8",
+      "tipo_via": "via_urbana",
+      "imd": 14800,
+      "pct_pesados": 3.5,
+      "sentidos": "ambos",
+      "fecha_dato": "2023-12-31"
+    },
+    "SHE-ERA-001": {
+      "via": "BI-637 (Lutxana-Asúa)",
+      "tramo": "Erandio comercial",
+      "tipo_via": "carretera_local",
+      "imd": 22100,
+      "pct_pesados": 5.4,
+      "sentidos": "ambos",
+      "fecha_dato": "2023-12-31"
+    },
+    "ERO-LEI-001": {
+      "via": "Avenida Iparraguirre",
+      "tramo": "Leioa - acceso BI-637",
+      "tipo_via": "via_urbana",
+      "imd": 16500,
+      "pct_pesados": 3.8,
+      "sentidos": "ambos",
+      "fecha_dato": "2023-12-31"
+    }
+  }
+}

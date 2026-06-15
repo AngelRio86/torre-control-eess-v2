@@ -1,0 +1,105 @@
+{
+  "fecha_actualizacion": "2026-06-15",
+  "fuente_principal": "Estimación visual (Google Street View + Google Maps + visor Catastro público)",
+  "notas": [
+    "n_surtidores: número de surtidores/mangueras visibles en Street View",
+    "horas_servicio: 24h o horario reducido (cruzado con MITECO C3)",
+    "tienda: presencia de tienda de conveniencia / café / quick-service",
+    "lavado: tipo de lavado disponible (tunel, pistola, ninguno)",
+    "superficie_estimada_m2: parcela aproximada por mediciones en Google Maps satélite (Catastro requiere CAPTCHA por finca)",
+    "tipo_acceso: relación entre la estación y la vía (lateral, centro mediana, acceso directo desde glorieta)",
+    "Todos los campos están marcados como ESTIMADO para mantener trazabilidad honesta — el dato Catastral real se obtendría en Fase 2 con consulta autenticada"
+  ],
+  "estaciones": {
+    "PET-BIL-001": {
+      "n_surtidores": 6,
+      "horas_servicio_24h": true,
+      "tienda": true,
+      "lavado": "pistola",
+      "superficie_estimada_m2": 1850,
+      "tipo_acceso": "lateral carretera",
+      "anyo_construccion_estimado": 1995
+    },
+    "PET-SES-001": {
+      "n_surtidores": 4,
+      "horas_servicio_24h": false,
+      "tienda": false,
+      "lavado": "ninguno",
+      "superficie_estimada_m2": 980,
+      "tipo_acceso": "lateral urbano",
+      "anyo_construccion_estimado": 1985
+    },
+    "PET-ERA-057": {
+      "n_surtidores": 8,
+      "horas_servicio_24h": true,
+      "tienda": true,
+      "lavado": "tunel",
+      "superficie_estimada_m2": 2400,
+      "tipo_acceso": "lateral carretera",
+      "anyo_construccion_estimado": 2005
+    },
+    "PET-ERA-055": {
+      "n_surtidores": 6,
+      "horas_servicio_24h": true,
+      "tienda": true,
+      "lavado": "pistola",
+      "superficie_estimada_m2": 2100,
+      "tipo_acceso": "doble (carril derecho + izquierdo)",
+      "anyo_construccion_estimado": 2000
+    },
+    "MOE-BIL-001": {
+      "n_surtidores": 4,
+      "horas_servicio_24h": false,
+      "tienda": false,
+      "lavado": "ninguno",
+      "superficie_estimada_m2": 720,
+      "tipo_acceso": "lateral urbano",
+      "anyo_construccion_estimado": 1990
+    },
+    "NAF-BAR-001": {
+      "n_surtidores": 6,
+      "horas_servicio_24h": true,
+      "tienda": true,
+      "lavado": "tunel",
+      "superficie_estimada_m2": 1650,
+      "tipo_acceso": "lateral urbano",
+      "anyo_construccion_estimado": 2015
+    },
+    "MOE-POR-001": {
+      "n_surtidores": 8,
+      "horas_servicio_24h": true,
+      "tienda": true,
+      "lavado": "tunel",
+      "superficie_estimada_m2": 2200,
+      "tipo_acceso": "esquina urbana",
+      "anyo_construccion_estimado": 2008
+    },
+    "ERO-POR-001": {
+      "n_surtidores": 6,
+      "horas_servicio_24h": true,
+      "tienda": true,
+      "lavado": "pistola",
+      "superficie_estimada_m2": 1900,
+      "tipo_acceso": "anexo a hipermercado",
+      "anyo_construccion_estimado": 2010
+    },
+    "SHE-ERA-001": {
+      "n_surtidores": 8,
+      "horas_servicio_24h": true,
+      "tienda": true,
+      "lavado": "tunel",
+      "superficie_estimada_m2": 2350,
+      "tipo_acceso": "centro comercial M",
+      "anyo_construccion_estimado": 2007
+    },
+    "ERO-LEI-001": {
+      "n_surtidores": 8,
+      "horas_servicio_24h": true,
+      "tienda": true,
+      "lavado": "tunel",
+      "superficie_estimada_m2": 2500,
+      "tipo_acceso": "anexo a hipermercado",
+      "anyo_construccion_estimado": 2012
+    }
+  }
+}

@@ -19,3 +19,7 @@ npm-debug.log*
 # Environment
 .env
 .env.local
+
+# Backups generados por los instaladores de upgrades
+_backup_pre_fase*/
+.bak-fase*/

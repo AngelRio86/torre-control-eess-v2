@@ -1,0 +1,97 @@
+{
+  "fecha_actualizacion": "2026-06-15",
+  "fuente_principal": "Eustat 2024 + INE Atlas de Renta 2022",
+  "notas": [
+    "Población: Eustat — Estadística de población municipal 2024 (1 enero)",
+    "Renta neta media por hogar: INE Atlas de Distribución de Renta de los Hogares 2022 (última publicación disponible)",
+    "Parque de vehículos: Eustat/DGT 2024",
+    "Edad media: Eustat 2024",
+    "% mayores 65 años: Eustat 2024",
+    "Estos datos están asignados al municipio donde se ubica cada estación; se utilizan como proxy de demanda local"
+  ],
+  "municipios": {
+    "Bilbao": {
+      "poblacion": 346843,
+      "edad_media": 47.2,
+      "pct_mayores_65": 24.1,
+      "renta_neta_hogar": 37120,
+      "renta_per_capita": 16847,
+      "vehiculos_total": 154622,
+      "vehiculos_por_mil_hab": 446,
+      "fecha_dato": "2024-01-01"
+    },
+    "Sestao": {
+      "poblacion": 26509,
+      "edad_media": 49.8,
+      "pct_mayores_65": 27.4,
+      "renta_neta_hogar": 27850,
+      "renta_per_capita": 12041,
+      "vehiculos_total": 11280,
+      "vehiculos_por_mil_hab": 425,
+      "fecha_dato": "2024-01-01"
+    },
+    "Erandio": {
+      "poblacion": 24795,
+      "edad_media": 47.5,
+      "pct_mayores_65": 23.8,
+      "renta_neta_hogar": 32990,
+      "renta_per_capita": 14215,
+      "vehiculos_total": 12480,
+      "vehiculos_por_mil_hab": 503,
+      "fecha_dato": "2024-01-01"
+    },
+    "Erandio-Goikoa": {
+      "poblacion": 24795,
+      "edad_media": 47.5,
+      "pct_mayores_65": 23.8,
+      "renta_neta_hogar": 32990,
+      "renta_per_capita": 14215,
+      "vehiculos_total": 12480,
+      "vehiculos_por_mil_hab": 503,
+      "fecha_dato": "2024-01-01",
+      "nota": "Erandio-Goikoa es entidad menor de Erandio; se usan los mismos datos municipales"
+    },
+    "Barakaldo": {
+      "poblacion": 100437,
+      "edad_media": 47.8,
+      "pct_mayores_65": 24.7,
+      "renta_neta_hogar": 32530,
+      "renta_per_capita": 13862,
+      "vehiculos_total": 47820,
+      "vehiculos_por_mil_hab": 476,
+      "fecha_dato": "2024-01-01"
+    },
+    "Portugalete": {
+      "poblacion": 45470,
+      "edad_media": 49.1,
+      "pct_mayores_65": 26.8,
+      "renta_neta_hogar": 32090,
+      "renta_per_capita": 13524,
+      "vehiculos_total": 19310,
+      "vehiculos_por_mil_hab": 425,
+      "fecha_dato": "2024-01-01"
+    },
+    "Leioa": {
+      "poblacion": 32083,
+      "edad_media": 46.2,
+      "pct_mayores_65": 22.5,
+      "renta_neta_hogar": 42410,
+      "renta_per_capita": 17943,
+      "vehiculos_total": 16850,
+      "vehiculos_por_mil_hab": 525,
+      "fecha_dato": "2024-01-01"
+    }
+  },
+  "estaciones": {
+    "PET-BIL-001": { "municipio": "Bilbao" },
+    "PET-SES-001": { "municipio": "Sestao" },
+    "PET-ERA-057": { "municipio": "Erandio" },
+    "PET-ERA-055": { "municipio": "Erandio-Goikoa" },
+    "MOE-BIL-001": { "municipio": "Bilbao" },
+    "NAF-BAR-001": { "municipio": "Barakaldo" },
+    "MOE-POR-001": { "municipio": "Portugalete" },
+    "ERO-POR-001": { "municipio": "Portugalete" },
+    "SHE-ERA-001": { "municipio": "Erandio" },
+    "ERO-LEI-001": { "municipio": "Leioa" }
+  }
+}

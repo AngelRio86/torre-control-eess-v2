@@ -4,6 +4,9 @@
 
 import C3_MITECO from './c3_miteco.json';
 import C3_OSM    from './c3_osm.json';
+import C2_EUSTAT from './c2_eustat.json';
+import C4_ACTIVO from './c4_activo.json';
+import C5_AFOROS from './c5_aforos.json';
 
 // ============================================================================
 // REGISTRO DE FUENTES
@@ -12,13 +15,14 @@ export const FUENTES = {
   GMAPS_MANUAL: { id: 'gmaps_manual', label: 'Google Maps (consulta manual)', tipo: 'real' },
   MITECO:       { id: 'miteco',       label: 'MITECO Geoportal de Hidrocarburos', tipo: 'real' },
   CATASTRO:     { id: 'catastro',     label: 'Sede Electrónica del Catastro', tipo: 'real' },
-  INE:          { id: 'ine',          label: 'INE — Padrón + Atlas de Renta', tipo: 'real' },
-  EUSTAT:       { id: 'eustat',       label: 'Eustat', tipo: 'real' },
+  INE:          { id: 'ine',          label: 'INE — Atlas de Renta de los Hogares 2022', tipo: 'real' },
+  EUSTAT:       { id: 'eustat',       label: 'Eustat — Estadística municipal 2024', tipo: 'real' },
   DGT:          { id: 'dgt',          label: 'DGT — Parque de vehículos', tipo: 'real' },
-  AFOROS_DGT:   { id: 'aforos_dgt',   label: 'DGT — Mapa de aforos', tipo: 'real' },
+  AFOROS_DGT:   { id: 'aforos_dgt',   label: 'DGT — Mapa de Aforos 2023', tipo: 'real' },
   OPENCHARGE:   { id: 'openchargemap',label: 'OpenChargeMap', tipo: 'real' },
   IDE:          { id: 'ide',          label: 'i-DE — Mapa de capacidad de la red', tipo: 'real' },
   OSM:          { id: 'osm',          label: 'OpenStreetMap (Overpass API)', tipo: 'real' },
+  GMAPS_SAT:    { id: 'gmaps_sat',    label: 'Google Maps Satélite + Street View (estimación)', tipo: 'estimado' },
   ESTIMADO:     { id: 'estimado',     label: 'Estimación interna', tipo: 'estimado' },
   NO_DISP:      { id: 'no_disponible',label: 'No disponible', tipo: 'no_disponible' },
 };
@@ -47,10 +51,35 @@ const capaPendiente = (fuentes_previstas) => ({
 });
 
 // ============================================================================
-// BUILDER · Capa C3 a partir de c3_miteco.json
-// Si el script de ingesta aún no se ha ejecutado, el JSON está vacío y la capa
-// queda como "pendiente". Una vez ejecutado `python3 scripts/fetch_miteco.py`,
-// la capa se rellena automáticamente con los precios reales.
+// BUILDER · Capa C2 — Demanda territorial (Eustat + INE)
+// ============================================================================
+function buildC2(stationId) {
+  const meta = C2_EUSTAT?.estaciones?.[stationId];
+  if (!meta) return capaPendiente(['Eustat', 'INE', 'DGT']);
+
+  const m = C2_EUSTAT.municipios[meta.municipio];
+  if (!m) return capaPendiente(['Eustat', 'INE', 'DGT']);
+
+  const fechaE = m.fecha_dato;
+  const fechaI = '2022-12-31'; // INE Atlas de Renta 2022 es el último disponible
+
+  return {
+    disponible: true,
+    parcial: true, // falta DGT parque de vehículos detallado por sección censal
+    fuentes_presentes: ['eustat', 'ine'],
+    municipio: meta.municipio,
+    poblacion:        dato(m.poblacion,             FUENTES.EUSTAT, fechaE),
+    edad_media:       dato(m.edad_media,            FUENTES.EUSTAT, fechaE),
+    pct_mayores_65:   dato(m.pct_mayores_65,        FUENTES.EUSTAT, fechaE),
+    renta_neta_hogar: dato(m.renta_neta_hogar,      FUENTES.INE,    fechaI),
+    renta_per_capita: dato(m.renta_per_capita,      FUENTES.INE,    fechaI),
+    vehiculos_total:  dato(m.vehiculos_total,       FUENTES.EUSTAT, fechaE),
+    veh_por_mil_hab:  dato(m.vehiculos_por_mil_hab, FUENTES.EUSTAT, fechaE),
+  };
+}
+
+// ============================================================================
+// BUILDER · Capa C3 (MITECO + OSM) — sin cambios
 // ============================================================================
 function buildC3(stationId, tipo) {
   const data = C3_MITECO?.estaciones?.[stationId];
@@ -61,7 +90,6 @@ function buildC3(stationId, tipo) {
   }
 
   const fecha = data?.fecha_dato || C3_MITECO?.fecha_actualizacion;
-  const tieneTodas = data && osm; // OpenChargeMap aún pendiente, siempre parcial
   const c3 = {
     disponible: true,
     parcial: true, // EV (OpenChargeMap) aún pendiente
@@ -75,7 +103,6 @@ function buildC3(stationId, tipo) {
     diesel_premium: data?.diesel_premium != null ? dato(data.diesel_premium, FUENTES.MITECO, fecha) : noDisp(),
   };
 
-  // Para Petronor: añadir métricas de cluster (vs. sus 2 competidores)
   const cluster = data ? C3_MITECO?.clusters?.[stationId] : null;
   if (cluster && tipo === 'petronor') {
     c3.n_competidores_con_dato  = cluster.n_competidores_con_dato;
@@ -87,7 +114,6 @@ function buildC3(stationId, tipo) {
     c3.gap_vs_min_diesel        = cluster.gap_vs_min_diesel        != null ? dato(cluster.gap_vs_min_diesel,        FUENTES.MITECO, fecha) : noDisp();
   }
 
-  // ── OpenStreetMap (POIs del entorno comercial en 1 km) ────────────────────
   if (osm) {
     const fechaO = C3_OSM.fecha_actualizacion;
     const poi = (key) => {
@@ -121,6 +147,58 @@ function buildC3(stationId, tipo) {
 }
 
 // ============================================================================
+// BUILDER · Capa C4 — Activo y opcionalidad (estimación visual)
+// ============================================================================
+function buildC4(stationId) {
+  const d = C4_ACTIVO?.estaciones?.[stationId];
+  if (!d) return capaPendiente(['Catastro', 'i-DE']);
+
+  const fecha = C4_ACTIVO.fecha_actualizacion;
+  return {
+    disponible: true,
+    parcial: true, // datos estimados; Catastro auténtico requiere consulta Fase 2
+    fuentes_presentes: ['gmaps_sat'],
+    n_surtidores:            dato(d.n_surtidores,           FUENTES.GMAPS_SAT, fecha),
+    horas_servicio_24h:      dato(d.horas_servicio_24h,     FUENTES.GMAPS_SAT, fecha),
+    tienda:                  dato(d.tienda,                 FUENTES.GMAPS_SAT, fecha),
+    lavado:                  dato(d.lavado,                 FUENTES.GMAPS_SAT, fecha),
+    superficie_m2:           dato(d.superficie_estimada_m2, FUENTES.GMAPS_SAT, fecha),
+    tipo_acceso:             dato(d.tipo_acceso,            FUENTES.GMAPS_SAT, fecha),
+    anyo_construccion:       dato(d.anyo_construccion_estimado, FUENTES.GMAPS_SAT, fecha),
+  };
+}
+
+// ============================================================================
+// BUILDER · Capa C5 — Movilidad real (Aforos DGT)
+// ============================================================================
+function buildC5(stationId) {
+  const d = C5_AFOROS?.estaciones?.[stationId];
+  if (!d) return capaPendiente(['Aforos DGT']);
+
+  const fecha = d.fecha_dato;
+  return {
+    disponible: true,
+    parcial: false, // si tenemos aforos, consideramos completa esta primera versión
+    fuentes_presentes: ['aforos_dgt'],
+    via:           d.via,
+    tramo:         d.tramo,
+    tipo_via:      d.tipo_via,
+    imd:           dato(d.imd,          FUENTES.AFOROS_DGT, fecha),
+    pct_pesados:   dato(d.pct_pesados,  FUENTES.AFOROS_DGT, fecha),
+    sentidos:      d.sentidos,
+  };
+}
+
+// ============================================================================
+// BUILDER reutilizable para C6 (existente)
+// ============================================================================
+const c6 = (rating, n_resenas, fecha = '2026-06-11') => ({
+  disponible: true,
+  rating:    dato(rating,    FUENTES.GMAPS_MANUAL, fecha),
+  n_resenas: dato(n_resenas, FUENTES.GMAPS_MANUAL, fecha),
+});
+
+// ============================================================================
 // ESTACIONES
 // ============================================================================
 export const STATIONS = [
@@ -141,15 +219,11 @@ export const STATIONS = [
     competidores: ['MOE-BIL-001', 'NAF-BAR-001'],
     capas: {
       c1_interno: capaPendiente(['Sistemas Petronor (Fase 2)']),
-      c2_demanda: capaPendiente(['INE', 'Eustat', 'DGT', 'Catastro']),
+      c2_demanda: buildC2('PET-BIL-001'),
       c3_competencia: buildC3('PET-BIL-001', 'petronor'),
-      c4_activo: capaPendiente(['Catastro', 'i-DE']),
-      c5_movilidad: capaPendiente(['Aforos DGT']),
-      c6_reputacion: {
-        disponible: true,
-        rating:    dato(3.9, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-        n_resenas: dato(458, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-      },
+      c4_activo: buildC4('PET-BIL-001'),
+      c5_movilidad: buildC5('PET-BIL-001'),
+      c6_reputacion: c6(3.9, 458),
     },
   },
   {
@@ -166,15 +240,11 @@ export const STATIONS = [
     competidores: ['MOE-POR-001', 'ERO-POR-001'],
     capas: {
       c1_interno: capaPendiente(['Sistemas Petronor (Fase 2)']),
-      c2_demanda: capaPendiente(['INE', 'Eustat', 'DGT', 'Catastro']),
+      c2_demanda: buildC2('PET-SES-001'),
       c3_competencia: buildC3('PET-SES-001', 'petronor'),
-      c4_activo: capaPendiente(['Catastro', 'i-DE']),
-      c5_movilidad: capaPendiente(['Aforos DGT']),
-      c6_reputacion: {
-        disponible: true,
-        rating:    dato(4.4, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-        n_resenas: dato(36, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-      },
+      c4_activo: buildC4('PET-SES-001'),
+      c5_movilidad: buildC5('PET-SES-001'),
+      c6_reputacion: c6(4.4, 36),
     },
   },
   {
@@ -191,15 +261,11 @@ export const STATIONS = [
     competidores: ['SHE-ERA-001', 'ERO-LEI-001'],
     capas: {
       c1_interno: capaPendiente(['Sistemas Petronor (Fase 2)']),
-      c2_demanda: capaPendiente(['INE', 'Eustat', 'DGT', 'Catastro']),
+      c2_demanda: buildC2('PET-ERA-057'),
       c3_competencia: buildC3('PET-ERA-057', 'petronor'),
-      c4_activo: capaPendiente(['Catastro', 'i-DE']),
-      c5_movilidad: capaPendiente(['Aforos DGT']),
-      c6_reputacion: {
-        disponible: true,
-        rating:    dato(4.0, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-        n_resenas: dato(361, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-      },
+      c4_activo: buildC4('PET-ERA-057'),
+      c5_movilidad: buildC5('PET-ERA-057'),
+      c6_reputacion: c6(4.0, 361),
     },
   },
   {
@@ -219,15 +285,11 @@ export const STATIONS = [
     competidores: ['SHE-ERA-001', 'ERO-LEI-001'],
     capas: {
       c1_interno: capaPendiente(['Sistemas Petronor (Fase 2)']),
-      c2_demanda: capaPendiente(['INE', 'Eustat', 'DGT', 'Catastro']),
+      c2_demanda: buildC2('PET-ERA-055'),
       c3_competencia: buildC3('PET-ERA-055', 'petronor'),
-      c4_activo: capaPendiente(['Catastro', 'i-DE']),
-      c5_movilidad: capaPendiente(['Aforos DGT']),
-      c6_reputacion: {
-        disponible: true,
-        rating:    dato(4.0, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-        n_resenas: dato(113, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-      },
+      c4_activo: buildC4('PET-ERA-055'),
+      c5_movilidad: buildC5('PET-ERA-055'),
+      c6_reputacion: c6(4.0, 113),
     },
   },
 
@@ -248,15 +310,11 @@ export const STATIONS = [
     distancia_km: { 'PET-BIL-001': 2.53 },
     capas: {
       c1_interno: capaPendiente(['Benchmark sectorial AOP/CNMC (Fase 2)']),
-      c2_demanda: capaPendiente(['INE', 'Eustat', 'DGT', 'Catastro']),
+      c2_demanda: buildC2('MOE-BIL-001'),
       c3_competencia: buildC3('MOE-BIL-001', 'competidor'),
-      c4_activo: capaPendiente(['Catastro', 'i-DE']),
-      c5_movilidad: capaPendiente(['Aforos DGT']),
-      c6_reputacion: {
-        disponible: true,
-        rating:    dato(4.0, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-        n_resenas: dato(66, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-      },
+      c4_activo: buildC4('MOE-BIL-001'),
+      c5_movilidad: buildC5('MOE-BIL-001'),
+      c6_reputacion: c6(4.0, 66),
     },
   },
   {
@@ -273,15 +331,11 @@ export const STATIONS = [
     distancia_km: { 'PET-BIL-001': 4.11 },
     capas: {
       c1_interno: capaPendiente(['Benchmark sectorial AOP/CNMC (Fase 2)']),
-      c2_demanda: capaPendiente(['INE', 'Eustat', 'DGT', 'Catastro']),
+      c2_demanda: buildC2('NAF-BAR-001'),
       c3_competencia: buildC3('NAF-BAR-001', 'competidor'),
-      c4_activo: capaPendiente(['Catastro', 'i-DE']),
-      c5_movilidad: capaPendiente(['Aforos DGT']),
-      c6_reputacion: {
-        disponible: true,
-        rating:    dato(4.4, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-        n_resenas: dato(36, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-      },
+      c4_activo: buildC4('NAF-BAR-001'),
+      c5_movilidad: buildC5('NAF-BAR-001'),
+      c6_reputacion: c6(4.4, 36),
     },
   },
   {
@@ -298,15 +352,11 @@ export const STATIONS = [
     distancia_km: { 'PET-SES-001': 0.91 },
     capas: {
       c1_interno: capaPendiente(['Benchmark sectorial AOP/CNMC (Fase 2)']),
-      c2_demanda: capaPendiente(['INE', 'Eustat', 'DGT', 'Catastro']),
+      c2_demanda: buildC2('MOE-POR-001'),
       c3_competencia: buildC3('MOE-POR-001', 'competidor'),
-      c4_activo: capaPendiente(['Catastro', 'i-DE']),
-      c5_movilidad: capaPendiente(['Aforos DGT']),
-      c6_reputacion: {
-        disponible: true,
-        rating:    dato(4.0, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-        n_resenas: dato(220, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-      },
+      c4_activo: buildC4('MOE-POR-001'),
+      c5_movilidad: buildC5('MOE-POR-001'),
+      c6_reputacion: c6(4.0, 220),
     },
   },
   {
@@ -323,15 +373,11 @@ export const STATIONS = [
     distancia_km: { 'PET-SES-001': 1.13 },
     capas: {
       c1_interno: capaPendiente(['Benchmark sectorial AOP/CNMC (Fase 2)']),
-      c2_demanda: capaPendiente(['INE', 'Eustat', 'DGT', 'Catastro']),
+      c2_demanda: buildC2('ERO-POR-001'),
       c3_competencia: buildC3('ERO-POR-001', 'competidor'),
-      c4_activo: capaPendiente(['Catastro', 'i-DE']),
-      c5_movilidad: capaPendiente(['Aforos DGT']),
-      c6_reputacion: {
-        disponible: true,
-        rating:    dato(4.0, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-        n_resenas: dato(222, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-      },
+      c4_activo: buildC4('ERO-POR-001'),
+      c5_movilidad: buildC5('ERO-POR-001'),
+      c6_reputacion: c6(4.0, 222),
     },
   },
   {
@@ -348,15 +394,11 @@ export const STATIONS = [
     distancia_km: { 'PET-ERA-057': 0.80, 'PET-ERA-055': 1.49 },
     capas: {
       c1_interno: capaPendiente(['Benchmark sectorial AOP/CNMC (Fase 2)']),
-      c2_demanda: capaPendiente(['INE', 'Eustat', 'DGT', 'Catastro']),
+      c2_demanda: buildC2('SHE-ERA-001'),
       c3_competencia: buildC3('SHE-ERA-001', 'competidor'),
-      c4_activo: capaPendiente(['Catastro', 'i-DE']),
-      c5_movilidad: capaPendiente(['Aforos DGT']),
-      c6_reputacion: {
-        disponible: true,
-        rating:    dato(4.1, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-        n_resenas: dato(167, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-      },
+      c4_activo: buildC4('SHE-ERA-001'),
+      c5_movilidad: buildC5('SHE-ERA-001'),
+      c6_reputacion: c6(4.1, 167),
     },
   },
   {
@@ -373,15 +415,11 @@ export const STATIONS = [
     distancia_km: { 'PET-ERA-057': 2.56, 'PET-ERA-055': 3.16 },
     capas: {
       c1_interno: capaPendiente(['Benchmark sectorial AOP/CNMC (Fase 2)']),
-      c2_demanda: capaPendiente(['INE', 'Eustat', 'DGT', 'Catastro']),
+      c2_demanda: buildC2('ERO-LEI-001'),
       c3_competencia: buildC3('ERO-LEI-001', 'competidor'),
-      c4_activo: capaPendiente(['Catastro', 'i-DE']),
-      c5_movilidad: capaPendiente(['Aforos DGT']),
-      c6_reputacion: {
-        disponible: true,
-        rating:    dato(4.0, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-        n_resenas: dato(2206, FUENTES.GMAPS_MANUAL, '2026-06-11'),
-      },
+      c4_activo: buildC4('ERO-LEI-001'),
+      c5_movilidad: buildC5('ERO-LEI-001'),
+      c6_reputacion: c6(4.0, 2206),
     },
   },
 ];
