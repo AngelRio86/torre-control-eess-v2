@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import SourceBadge from './SourceBadge';
 import BrandTag from './BrandTag';
+import StrategicBrief from './StrategicBrief';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Primitivos
@@ -115,9 +116,9 @@ function PoiRow({ label, kpi, dist }) {
 // Total de fuentes previstas por capa (numerador = fuentes ya integradas)
 const FUENTES_PREVISTAS = {
   c1_interno: 1,     // Sistemas Petronor
-  c2_demanda: 4,     // INE + Eustat + DGT + Catastro
+  c2_demanda: 4,     // Eustat + INE + DGT + Catastro
   c3_competencia: 3, // MITECO + OSM + OpenChargeMap
-  c4_activo: 1,      // Catastro
+  c4_activo: 2,      // Estimación visual + Catastro real
   c5_movilidad: 1,   // Aforos DGT
   c6_reputacion: 1,  // Google Maps manual
 };
@@ -186,7 +187,7 @@ function LayerCard({ num, title, capaKey, capa, defaultOpen = false, children })
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Panel "pendiente" reusable para C1, C2, C4, C5
+// Panel "pendiente" reusable
 // ─────────────────────────────────────────────────────────────────────────────
 function PendientePanel({ capa }) {
   return (
@@ -236,6 +237,12 @@ function PendientePanel({ capa }) {
 // ─────────────────────────────────────────────────────────────────────────────
 const fmtPrice = v => `${v.toFixed(3)} €/L`;
 const fmtGap = v => `${v >= 0 ? '+' : ''}${v.toFixed(3)} €/L`;
+const fmtInt = v => v.toLocaleString('es-ES');
+const fmtEuro = v => `${v.toLocaleString('es-ES')} €`;
+const fmtPct = v => `${v.toFixed(1)}%`;
+const fmtYears = v => `${v.toFixed(1)} años`;
+const fmtM2 = v => `${v.toLocaleString('es-ES')} m²`;
+const fmtBool = v => v ? 'Sí' : 'No';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Componente principal
@@ -344,7 +351,7 @@ export default function StationDetail({ station }) {
               <span style={{ fontSize: '16px', color: 'var(--text-dim)' }}>/ 6</span>
             </div>
             <div style={{ fontSize: '11px', color: 'var(--text-dim)', marginTop: '4px' }}>
-              El resto en Fase 4
+              Roadmap continuo
             </div>
           </div>
 
@@ -408,10 +415,13 @@ export default function StationDetail({ station }) {
               —
             </div>
             <div style={{ fontSize: '11px', color: 'var(--text-dim)', marginTop: '4px' }}>
-              Requiere C1–C5
+              Requiere C1 completa
             </div>
           </div>
         </div>
+
+        {/* ── STRATEGIC BRIEF (solo Petronor) ── */}
+        {isPetronor && <StrategicBrief station={station} />}
 
         {/* ── CAPAS ── */}
         <div className="mb-2">
@@ -429,12 +439,60 @@ export default function StationDetail({ station }) {
 
         <div className="flex flex-col gap-3">
 
+          {/* ─── CAPA 01 · Datos internos ──────────────────────────────────── */}
           <LayerCard num={1} title="Datos internos del negocio" capaKey="c1_interno" capa={c1}>
             <PendientePanel capa={c1} />
           </LayerCard>
 
-          <LayerCard num={2} title="Demanda territorial" capaKey="c2_demanda" capa={c2}>
-            <PendientePanel capa={c2} />
+          {/* ─── CAPA 02 · Demanda territorial ──────────────────────────────── */}
+          <LayerCard num={2} title="Demanda territorial" capaKey="c2_demanda" capa={c2} defaultOpen={c2?.disponible === true}>
+            {c2?.disponible ? (
+              <div className="grid gap-6" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                <div>
+                  <div style={{
+                    fontSize: '11px',
+                    color: 'var(--text-dim)',
+                    fontFamily: 'JetBrains Mono, monospace',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    marginBottom: '8px',
+                  }}>
+                    Demografía · {c2.municipio}
+                  </div>
+                  <KpiRow label="👥 Población"       kpi={c2.poblacion}      format={fmtInt} />
+                  <KpiRow label="📅 Edad media"      kpi={c2.edad_media}     format={fmtYears} />
+                  <KpiRow label="👴 % mayores 65"    kpi={c2.pct_mayores_65} format={fmtPct} />
+                </div>
+                <div>
+                  <div style={{
+                    fontSize: '11px',
+                    color: 'var(--text-dim)',
+                    fontFamily: 'JetBrains Mono, monospace',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    marginBottom: '8px',
+                  }}>
+                    Economía y movilidad
+                  </div>
+                  <KpiRow label="💶 Renta neta/hogar"     kpi={c2.renta_neta_hogar} format={fmtEuro} />
+                  <KpiRow label="👤 Renta per cápita"    kpi={c2.renta_per_capita} format={fmtEuro} />
+                  <KpiRow label="🚗 Parque vehículos"    kpi={c2.vehiculos_total}  format={fmtInt} />
+                  <KpiRow label="🚘 Vehículos/1000 hab"  kpi={c2.veh_por_mil_hab}  format={fmtInt} />
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <div style={{
+                    fontSize: '10px',
+                    color: 'var(--text-dim)',
+                    marginTop: '4px',
+                    fontStyle: 'italic',
+                  }}>
+                    Eustat y INE integrados. Catastro y DGT (parque por sección censal) pendientes para granularidad fina.
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <PendientePanel capa={c2} />
+            )}
           </LayerCard>
 
           {/* ─── CAPA 03 · Mapa competitivo ──────────────────────────────── */}
@@ -558,41 +616,105 @@ export default function StationDetail({ station }) {
                     <PoiRow label="⛽  EESS competencia" kpi={c3.n_eess_competencia_osm} dist={c3.dist_eess_competencia_m} />
                   </>
                 )}
-
-                {/* ── Mensaje pendientes ─────────────────────────────────── */}
-                {!hasClusterData && !c3.n_supermercados_1km && (
-                  <div>
-                    <div style={{
-                      fontSize: '11px',
-                      color: 'var(--text-dim)',
-                      fontFamily: 'JetBrains Mono, monospace',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.08em',
-                      marginBottom: '8px',
-                    }}>
-                      Próximos datos
-                    </div>
-                    <p style={{ fontSize: '12px', color: 'var(--text-sub)', lineHeight: 1.6 }}>
-                      Cargadores EV detallados (OpenChargeMap) en próximas iteraciones de la Fase 4.
-                    </p>
-                  </div>
-                )}
               </div>
             ) : (
               <PendientePanel capa={c3} />
             )}
           </LayerCard>
 
-          <LayerCard num={4} title="Activo y opcionalidad" capa={c4}>
-            <PendientePanel capa={c4} />
+          {/* ─── CAPA 04 · Activo y opcionalidad ───────────────────────── */}
+          <LayerCard num={4} title="Activo y opcionalidad" capaKey="c4_activo" capa={c4} defaultOpen={c4?.disponible === true}>
+            {c4?.disponible ? (
+              <div className="grid gap-6" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                <div>
+                  <div style={{
+                    fontSize: '11px',
+                    color: 'var(--text-dim)',
+                    fontFamily: 'JetBrains Mono, monospace',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    marginBottom: '8px',
+                  }}>
+                    Capacidad del activo
+                  </div>
+                  <KpiRow label="⛽ Nº surtidores"        kpi={c4.n_surtidores}       format={fmtInt} />
+                  <KpiRow label="📐 Superficie estimada" kpi={c4.superficie_m2}      format={fmtM2} />
+                  <KpiRow label="📅 Año construcción"    kpi={c4.anyo_construccion}  format={v => v.toString()} />
+                </div>
+                <div>
+                  <div style={{
+                    fontSize: '11px',
+                    color: 'var(--text-dim)',
+                    fontFamily: 'JetBrains Mono, monospace',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    marginBottom: '8px',
+                  }}>
+                    Servicios y acceso
+                  </div>
+                  <KpiRow label="🕐 Servicio 24h"           kpi={c4.horas_servicio_24h} format={fmtBool} />
+                  <KpiRow label="🏪 Tienda conveniencia"    kpi={c4.tienda}             format={fmtBool} />
+                  <KpiRow label="🧼 Lavado"                 kpi={c4.lavado}             format={v => v} />
+                  <KpiRow label="↪️ Tipo acceso"            kpi={c4.tipo_acceso}        format={v => v} />
+                </div>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <div style={{
+                    fontSize: '10px',
+                    color: 'var(--text-dim)',
+                    marginTop: '4px',
+                    fontStyle: 'italic',
+                  }}>
+                    Datos estimados a partir de Google Street View + satélite. Catastro auténtico (superficie exacta, referencia catastral) requiere consulta autenticada en Fase 2.
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <PendientePanel capa={c4} />
+            )}
           </LayerCard>
 
-          <LayerCard num={5} title="Movilidad real" capaKey="c5_movilidad" capa={c5}>
-            <PendientePanel capa={c5} />
+          {/* ─── CAPA 05 · Movilidad real ──────────────────────────────── */}
+          <LayerCard num={5} title="Movilidad real" capaKey="c5_movilidad" capa={c5} defaultOpen={c5?.disponible === true}>
+            {c5?.disponible ? (
+              <div>
+                <div style={{
+                  fontSize: '11px',
+                  color: 'var(--text-dim)',
+                  fontFamily: 'JetBrains Mono, monospace',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  marginBottom: '8px',
+                }}>
+                  Aforo DGT · {c5.via}
+                  <span style={{
+                    marginLeft: '8px',
+                    color: 'var(--text-sub)',
+                    textTransform: 'none',
+                    letterSpacing: 'normal',
+                  }}>
+                    ({c5.tramo})
+                  </span>
+                </div>
+                <div className="grid gap-6" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                  <KpiRow label="🚦 IMD (vehículos/día)" kpi={c5.imd}         format={fmtInt} />
+                  <KpiRow label="🚛 % vehículos pesados" kpi={c5.pct_pesados} format={fmtPct} />
+                </div>
+                <div style={{
+                  fontSize: '11px',
+                  color: 'var(--text-dim)',
+                  fontFamily: 'JetBrains Mono, monospace',
+                  marginTop: '10px',
+                }}>
+                  Tipo vía: {c5.tipo_via.replace('_', ' ')} · Sentidos: {c5.sentidos}
+                </div>
+              </div>
+            ) : (
+              <PendientePanel capa={c5} />
+            )}
           </LayerCard>
 
           {/* ─── CAPA 06 · Reputación ────────────────────────────────────── */}
-          <LayerCard num={6} title="Reputación de servicio" capa={c6} defaultOpen={true}>
+          <LayerCard num={6} title="Reputación de servicio" capaKey="c6_reputacion" capa={c6} defaultOpen={true}>
             {c6?.disponible ? (
               <div className="grid gap-6" style={{ gridTemplateColumns: '1fr 1fr' }}>
                 <div>

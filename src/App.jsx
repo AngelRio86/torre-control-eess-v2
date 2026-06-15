@@ -3,34 +3,35 @@ import Sidebar from './components/Sidebar';
 import MapView from './components/MapView';
 import StationDetail from './components/StationDetail';
 import CompareView from './components/CompareView';
+import PortfolioView from './components/PortfolioView';
 import { STATIONS } from './data/stations';
 
 const MAX_COMPARE = 4;
 
 export default function App() {
-  // 'browse'  → mapa o ficha (modo normal)
-  // 'select'  → el usuario está marcando estaciones para comparar
-  // 'compare' → mostrando la vista comparativa
-  const [mode, setMode] = useState('browse');
+  // 'browse'    → mapa o ficha (modo normal)
+  // 'select'    → el usuario está marcando estaciones para comparar
+  // 'compare'   → mostrando la vista comparativa
+  // 'portfolio' → vista CEO de portafolio
+  const [mode, setMode] = useState('portfolio'); // arranca en vista CEO
 
   const [selectedId, setSelectedId] = useState(null);
-  const [view, setView] = useState('map'); // 'map' | 'detail'
+  const [view, setView] = useState('map');
   const [selectedForCompare, setSelectedForCompare] = useState([]);
 
   const selected = STATIONS.find(s => s.id === selectedId);
   const compareStations = STATIONS.filter(s => selectedForCompare.includes(s.id));
 
-  // ── Handlers de modo browse ────────────────────────────────────────────────
+  // ── Handlers ───────────────────────────────────────────────────────────────
   const handleOpenDetail = id => {
     setSelectedId(id);
     setView('detail');
+    setMode('browse');
   };
   const handleBackToMap = () => {
     setView('map');
     setSelectedId(null);
   };
-
-  // ── Handlers del flujo de comparación ──────────────────────────────────────
   const handleEnterSelect = () => {
     setMode('select');
     setView('map');
@@ -56,23 +57,25 @@ export default function App() {
     setMode('browse');
     setSelectedForCompare([]);
   };
+  const handleOpenPortfolio = () => {
+    setMode('portfolio');
+    setView('map');
+    setSelectedId(null);
+    setSelectedForCompare([]);
+  };
+  const handleBackFromPortfolio = () => {
+    setMode('browse');
+    setView('map');
+  };
 
-  // ── Router del clic en marcador del mapa ───────────────────────────────────
-  // En modo browse → abre ficha; en modo select → toggle compare
   const handleMarkerClick = id => {
     if (mode === 'select') handleToggleCompare(id);
     else handleOpenDetail(id);
   };
 
-  // ── Router del clic en sidebar ─────────────────────────────────────────────
-  // Sidebar ya conoce el modo y dispara onSelect (browse) o onToggleCompare (select)
-  // Le pasamos handleOpenDetail como onSelect.
-
   const nPetronor = STATIONS.filter(s => s.tipo === 'petronor').length;
   const nCompetidores = STATIONS.filter(s => s.tipo === 'competidor').length;
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Render del header (cambia según el modo)
   // ─────────────────────────────────────────────────────────────────────────
   const renderHeader = () => {
     if (mode === 'select') {
@@ -160,6 +163,52 @@ export default function App() {
       );
     }
 
+    if (mode === 'portfolio') {
+      return (
+        <>
+          <div className="flex items-center gap-3">
+            <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
+            <span style={{
+              fontFamily: 'DM Serif Display, serif',
+              color: 'var(--text-head)',
+              fontSize: '15px',
+            }}>
+              Vista de Portafolio · Petronor Bilbao Metropolitano
+            </span>
+          </div>
+          <div className="flex items-center gap-3" style={{ fontSize: '11px', color: 'var(--text-dim)' }}>
+            <button
+              onClick={handleBackFromPortfolio}
+              style={{
+                padding: '4px 12px',
+                background: 'var(--surface)',
+                color: 'var(--text-sub)',
+                border: '1px solid var(--border)',
+                borderRadius: '6px',
+                fontSize: '11px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                fontFamily: 'DM Sans, sans-serif',
+              }}
+            >
+              Ver mapa
+            </button>
+            <span style={{
+              fontFamily: 'JetBrains Mono, monospace',
+              background: 'var(--bg)',
+              border: '1px solid var(--border)',
+              padding: '2px 8px',
+              borderRadius: '4px',
+            }}>
+              {new Date()
+                .toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+                .toUpperCase()}
+            </span>
+          </div>
+        </>
+      );
+    }
+
     // mode === 'browse'
     return (
       <>
@@ -186,6 +235,28 @@ export default function App() {
           </span>
         </div>
         <div className="flex items-center gap-3" style={{ fontSize: '11px', color: 'var(--text-dim)' }}>
+          <button
+            onClick={handleOpenPortfolio}
+            style={{
+              padding: '4px 12px',
+              background: 'var(--accent)',
+              color: 'white',
+              border: '1px solid var(--accent)',
+              borderRadius: '6px',
+              fontSize: '11px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontFamily: 'DM Sans, sans-serif',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+            }}
+          >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z" />
+            </svg>
+            Portafolio
+          </button>
           <button
             onClick={handleEnterSelect}
             style={{
@@ -230,10 +301,10 @@ export default function App() {
     );
   };
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Render del área principal
-  // ─────────────────────────────────────────────────────────────────────────
   const renderMain = () => {
+    if (mode === 'portfolio') {
+      return <PortfolioView stations={STATIONS} onSelect={handleOpenDetail} />;
+    }
     if (mode === 'compare') {
       return <CompareView stations={compareStations} />;
     }
