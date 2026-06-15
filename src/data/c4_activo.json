@@ -13,45 +13,52 @@
   "estaciones": {
     "PET-BIL-001": {
       "n_surtidores": 6,
-      "horas_servicio_24h": true,
+      "horas_servicio_24h": false,
       "tienda": true,
-      "lavado": "pistola",
+      "lavado": true,
       "superficie_estimada_m2": 1850,
       "tipo_acceso": "lateral carretera",
-      "anyo_construccion_estimado": 1995
+      "anyo_construccion_estimado": 1995,
+      "ev_propio": false
     },
     "PET-SES-001": {
       "n_surtidores": 4,
       "horas_servicio_24h": false,
-      "tienda": false,
-      "lavado": "ninguno",
+      "tienda": true,
+      "lavado": true,
       "superficie_estimada_m2": 980,
       "tipo_acceso": "lateral urbano",
-      "anyo_construccion_estimado": 1985
+      "anyo_construccion_estimado": 1985,
+      "ev_propio": false
     },
     "PET-ERA-057": {
       "n_surtidores": 8,
-      "horas_servicio_24h": true,
+      "horas_servicio_24h": false,
       "tienda": true,
-      "lavado": "tunel",
+      "lavado": true,
       "superficie_estimada_m2": 2400,
       "tipo_acceso": "lateral carretera",
-      "anyo_construccion_estimado": 2005
+      "anyo_construccion_estimado": 2005,
+      "ev_propio": true,
+      "ev_propio_operador": "Repsol Charging",
+      "ev_propio_n_puntos": 1,
+      "ev_propio_nota": "Cargador propio dentro de la EESS — validado por usuario 15/06/2026"
     },
     "PET-ERA-055": {
       "n_surtidores": 6,
-      "horas_servicio_24h": true,
+      "horas_servicio_24h": false,
       "tienda": true,
-      "lavado": "pistola",
+      "lavado": true,
       "superficie_estimada_m2": 2100,
       "tipo_acceso": "doble (carril derecho + izquierdo)",
-      "anyo_construccion_estimado": 2000
+      "anyo_construccion_estimado": 2000,
+      "ev_propio": false
     },
     "MOE-BIL-001": {
       "n_surtidores": 4,
       "horas_servicio_24h": false,
       "tienda": false,
-      "lavado": "ninguno",
+      "lavado": false,
       "superficie_estimada_m2": 720,
       "tipo_acceso": "lateral urbano",
       "anyo_construccion_estimado": 1990
@@ -60,7 +67,7 @@
       "n_surtidores": 6,
       "horas_servicio_24h": true,
       "tienda": true,
-      "lavado": "tunel",
+      "lavado": true,
       "superficie_estimada_m2": 1650,
       "tipo_acceso": "lateral urbano",
       "anyo_construccion_estimado": 2015
@@ -69,7 +76,7 @@
       "n_surtidores": 8,
       "horas_servicio_24h": true,
       "tienda": true,
-      "lavado": "tunel",
+      "lavado": true,
       "superficie_estimada_m2": 2200,
       "tipo_acceso": "esquina urbana",
       "anyo_construccion_estimado": 2008
@@ -78,7 +85,7 @@
       "n_surtidores": 6,
       "horas_servicio_24h": true,
       "tienda": true,
-      "lavado": "pistola",
+      "lavado": true,
       "superficie_estimada_m2": 1900,
       "tipo_acceso": "anexo a hipermercado",
       "anyo_construccion_estimado": 2010
@@ -87,7 +94,7 @@
       "n_surtidores": 8,
       "horas_servicio_24h": true,
       "tienda": true,
-      "lavado": "tunel",
+      "lavado": true,
       "superficie_estimada_m2": 2350,
       "tipo_acceso": "centro comercial M",
       "anyo_construccion_estimado": 2007
@@ -96,7 +103,7 @@
       "n_surtidores": 8,
       "horas_servicio_24h": true,
       "tienda": true,
-      "lavado": "tunel",
+      "lavado": true,
       "superficie_estimada_m2": 2500,
       "tipo_acceso": "anexo a hipermercado",
       "anyo_construccion_estimado": 2012

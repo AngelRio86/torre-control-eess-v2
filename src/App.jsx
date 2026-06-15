@@ -13,7 +13,7 @@ export default function App() {
   // 'select'    → el usuario está marcando estaciones para comparar
   // 'compare'   → mostrando la vista comparativa
   // 'portfolio' → vista CEO de portafolio
-  const [mode, setMode] = useState('portfolio'); // arranca en vista CEO
+  const [mode, setMode] = useState('browse'); // arranca en el mapa
 
   const [selectedId, setSelectedId] = useState(null);
   const [view, setView] = useState('map');
