@@ -68,8 +68,9 @@
         "nearest_m": null
       },
       "eess_competencia": {
-        "count": 1,
-        "nearest_m": 39
+        "count": 2,
+        "nearest_m": 906,
+        "fuente_corregida": "MITECO (coordenadas oficiales); OSM 39m descartado por inconsistencia"
       }
     },
     "PET-ERA-057": {
